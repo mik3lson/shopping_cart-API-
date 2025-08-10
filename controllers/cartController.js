@@ -11,7 +11,7 @@ exports.viewCart = (req, res) => {
     JOIN products p ON ci.productId = p.id
   `;
   db.query(sql, (err, results) => {
-    if (err) return res.status(500).send(err);
+    if (err) return res.status(500).send(err.message);
     // Calculate total from all subtotals then sends items and total to client
     const total = results.reduce((acc, item) => acc + item.subtotal, 0);
     res.json({ items: results, total });
@@ -26,7 +26,7 @@ exports.addItem = (req, res) => {
     'INSERT INTO cart_items (productId, quantity) VALUES (?, ?)',
     [productId, quantity],
     (err, result) => {
-      if (err) return res.status(500).send(err);
+      if (err) return res.status(500).send(err.message);
 
       //return to new cart item id on the frontend for reference
       res.json({ id: result.insertId });
@@ -42,7 +42,7 @@ exports.updateQuantity = (req, res) => {
     'UPDATE cart_items SET quantity=? WHERE id=?',
     [quantity, id],
     (err) => {
-      if (err) return res.status(500).send(err);
+      if (err) return res.status(500).send(err.message);
       // Respond with 200 OK if update is successful, 
       res.sendStatus(200);
     }
@@ -54,7 +54,7 @@ exports.removeItem = (req, res) => {
   const { id } = req.params;
   // Deletion is limited to the item with the given ID to avoid accidental mass deletions
   db.query('DELETE FROM cart_items WHERE id=?', [id], (err) => {
-    if (err) return res.status(500).send(err);
+    if (err) return res.status(500).send(err.message);
     // Respond with 200 OK if deletion is successful
     res.sendStatus(200);
   });

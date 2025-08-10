@@ -9,6 +9,9 @@ app.use(bodyParser.json()); // Parses incoming JSON requests
 app.use('/products', productRoutes); // Mount product-related routes
 app.use('/cart', cartRoutes);       // Mount cart-related routes
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
-});
+
+module.exports = app;
+
+//app.listen(3000, () => {
+  //console.log('Server running on http://localhost:3000');
+//});

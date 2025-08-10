@@ -5,7 +5,7 @@ exports.getAll = (req, res) => {
     // Simple SELECT returns the entire products table
   // No filters here — could be extended later for pagination or category filters
   db.query('SELECT * FROM products', (err, results) => {
-    if (err) return res.status(500).send(err);
+    if (err) return res.status(500).send(err.message);
     // Directly return results array to client
     res.json(results);
   });
@@ -17,7 +17,7 @@ exports.create = (req, res) => {
     'INSERT INTO products (sku, name, description, price, stockLevel, categoryId) VALUES (?, ?, ?, ?, ?, ?)',
     [sku, name, description, price, stockLevel, categoryId],
     (err, result) => {
-      if (err) return res.status(500).send(err);
+      if (err) return res.status(500).send(err.message);
 
       // Returning the new product's ID lets the frontend link or retrieve it immediately
       res.json({ id: result.insertId });
@@ -33,7 +33,7 @@ exports.update = (req, res) => {
     'UPDATE products SET sku=?, name=?, description=?, price=?, stockLevel=?, categoryId=? WHERE id=?',
     [sku, name, description, price, stockLevel, categoryId, id],
     (err) => {
-      if (err) return res.status(500).send(err);
+      if (err) return res.status(500).send(err.message);
       res.sendStatus(200);
     }
   );
@@ -45,7 +45,7 @@ exports.remove = (req, res) => {
 
   // Deletes only the product with matching ID to avoid unintended mass deletions
   db.query('DELETE FROM products WHERE id=?', [id], (err) => {
-    if (err) return res.status(500).send(err);
+    if (err) return res.status(500).send(err.message);
     res.sendStatus(200);
   });
 };
