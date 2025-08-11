@@ -58,8 +58,8 @@ PUT /cart/:id — Update quantity of a cart item.
 DELETE /cart/:id — Remove an item from the cart.
 
 ## Design decisions
-1. **Modular Controllers: Each resource (products, cart) has its own controller for better organization and scalability.**
-2. **Database Access: Used raw SQL queries via a shared MySQL connection for simplicity and control.**
+1. **Modular Controllers:** Separating the application logic into controllers (productController.js, cartController.js) helps keep the code organized and maintainable. Each controller handles a specific resource, making it easier to scale the project and onboard new developers.
+2. **Database Access:** Instead of using an ORM (Object-Relational Mapping) library, raw SQL queries were chosen to maintain full control over database interactions, improve performance, and reduce abstraction layers. This approach allows precise optimization of queries, especially important when joining tables (e.g., cart items and products) and calculating subtotals directly in SQL.
 3. **Error Handling: Basic error handling returns HTTP 500 status with error messages to facilitate debugging.**
 4. **Testing: Used Jest and Supertest with mocked database calls to isolate API logic without hitting a real database.**
 
