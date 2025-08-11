@@ -5,8 +5,8 @@
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/shopping-cart.git
-   cd shopping-cart
+   git clone https://github.com/mik3lson/shopping_cart-API-.git
+   cd shopping_cart-API-
 2. **Install dependecies**
    ```bash
    npm install
