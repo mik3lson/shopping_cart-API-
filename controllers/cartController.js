@@ -28,36 +28,46 @@ exports.addItem = (req, res) => {
     (err, results) =>{
       if (err) return res.status(500).send(err.message);
       
-
+      
       if (results.length === 0) {
         return res.status(404).json({ error: "Product not found" });
       }
 
       const stockLevel = results[0].stockLevel;
 
-      // Step 2: Compare stock with requested quantity
+      //Compare stock with requested quantity
       if (quantity > stockLevel) {
         return res.status(400).json({ 
           error: `Only ${stockLevel} item(s) available in stock` 
         });
       }
   
-  //parameters are validated before inserting into the cart to prevent SQL injection
-  db.query(
-    'INSERT INTO cart_items (productId, quantity) VALUES (?, ?)',
-    [productId, quantity],
-    (err, result) => {
-      if (err) return res.status(500).send(err.message);
+    //Insert product into cart
+      db.query(
+        'INSERT INTO cart_items (productId, quantity) VALUES (?, ?)',
+       [productId, quantity],
+       (err, result) => {
+         if (err) return res.status(500).send(err.message);
+      
 
-      //return to new cart item id on the frontend for reference
-      res.json({ 
-        id: result.insertId
+           //Decrement stock
+          db.query(
+            'UPDATE products SET stockLevel = stockLevel - ? WHERE id = ?',
+            [quantity, productId ],
+            (err2)=>{
+              if (err2) return res.status(500).send(err2.message);
+
+              //return the id of the new cart item
+              res.json({
+                id: result.insertId
+              });
+              })
+            }
+          )
       });
     }
-      );
+      
 
-});
-};
 
 // Update the quantity of an existing cart item
 exports.updateQuantity = (req, res) => {
