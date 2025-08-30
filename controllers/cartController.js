@@ -4,7 +4,6 @@ const db = require('../models/db'); // Import MySQL connection pool/instance
 // Retrieve all cart items along with product details and calculate the cart total
 exports.viewCart = (req, res) => {
   // SQL joins cart_items with products to get full item info (name, price)
-  // Calculates subtotal for each row directly in SQL for efficiency
   const sql = `
     SELECT ci.id, p.name, p.price, ci.quantity, (p.price * ci.quantity) AS subtotal
     FROM cart_items ci
@@ -19,8 +18,30 @@ exports.viewCart = (req, res) => {
 };
 
 exports.addItem = (req, res) => {
-  const { productId, quantity } = req.body;
+  const { id, quantity } = req.body;
+  const productId = id;
 
+  // check available stock before adding to cart
+  db.query(
+    'SELECT stockLevel FROM products WHERE id=?',
+    [productId],
+    (err, results) =>{
+      if (err) return res.status(500).send(err.message);
+      
+
+      if (results.length === 0) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      const stockLevel = results[0].stockLevel;
+
+      // Step 2: Compare stock with requested quantity
+      if (quantity > stockLevel) {
+        return res.status(400).json({ 
+          error: `Only ${stockLevel} item(s) available in stock` 
+        });
+      }
+  
   //parameters are validated before inserting into the cart to prevent SQL injection
   db.query(
     'INSERT INTO cart_items (productId, quantity) VALUES (?, ?)',
@@ -29,9 +50,13 @@ exports.addItem = (req, res) => {
       if (err) return res.status(500).send(err.message);
 
       //return to new cart item id on the frontend for reference
-      res.json({ id: result.insertId });
+      res.json({ 
+        id: result.insertId
+      });
     }
-  );
+      );
+
+});
 };
 
 // Update the quantity of an existing cart item
